@@ -6,7 +6,7 @@
 clear all;
 clc;
 
-% Define lists
+% Define listsw
 allFiles = 'allList.txt';
 trainList = 'trainCleanList.txt';
 testList = 'testCleanList.txt';
@@ -20,7 +20,7 @@ myData = textscan(fid,'%s');
 fclose(fid);
 myFiles = myData{1};
 for(i = 1:length(myFiles))
-    [snd,fs] = audioread(myFiles{i});
+    [snd,fs] = audioread(strrep(myFiles{i},'\','/'));
     [F0,lik] = fast_mbsc_fixedWinlen_tracking(snd,fs);
     featureDict(myFiles{i}) = mean(F0(lik>0.45));
     if(mod(i,10)==0)
@@ -59,8 +59,3 @@ disp(['The false positive rate is ',num2str(FPR*100),'%.'])
 disp(['The false negative rate is ',num2str(FNR*100),'%.'])
 
 toc
-
-
-
-
-
