@@ -55,7 +55,9 @@ end
 prediction = (scores>threshold);
 FPR = sum(~labels & prediction)/sum(~labels);
 FNR = sum(labels & ~prediction)/sum(labels);
+TotalError = sum(xor(labels,prediction))/size(labels,1);
 disp(['The false positive rate is ',num2str(FPR*100),'%.'])
 disp(['The false negative rate is ',num2str(FNR*100),'%.'])
+disp(['The Total Error is ',num2str(TotalError*100),'%.'])
 
 toc
