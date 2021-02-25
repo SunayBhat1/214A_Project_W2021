@@ -50,8 +50,8 @@ for iSpecWindow = 200:5:320
     disp(['The CC Total Error is ',num2str(TotalError_CC*100),'%.'])
 
 
-    Results(iR).Window = iSpecWindow;
-    Results(iR).Data = [TotalError_CC, FPR_CC, FNR_CC, TotalError_CB, FPR_CB, FNR_CB, TotalError_MC, FPR_MC, FNR_MC,...
+    Results_SSIM(iR).Window = iSpecWindow;
+    Results_SSIM(iR).Data = [TotalError_CC, FPR_CC, FNR_CC, TotalError_CB, FPR_CB, FNR_CB, TotalError_MC, FPR_MC, FNR_MC,...
         TotalError_MB, FPR_MB, FNR_MB];
 
     iR = iR + 1;

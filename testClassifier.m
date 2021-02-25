@@ -10,7 +10,7 @@ fileList2 = myData{2};
 labels = myData{3};
 scores = zeros(length(labels),1);
 for(i = 1:length(labels))
-    scores(i) = -immse(featureDict(fileList1{i}),featureDict(fileList2{i}));
+    scores(i) = -ssim(featureDict(fileList1{i}),featureDict(fileList2{i}));
 end
 prediction = (scores>threshold);
 FPR = sum(~labels & prediction)/sum(~labels);
