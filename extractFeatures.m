@@ -16,8 +16,11 @@ function featureDict = extractFeatures(featVect,hyperParms)
 %   2: Weighted Spectrogram
 %         |HyperParms:
 %           -SpecWindow (Window size of spectrogram)
-%   3: 
+%   3: Weighted Mel Spectrogram
+%         |HyperParms:
+%           -SpecWindowMel (Window size of spectrogram)
 %------------- BEGIN CODE --------------
+tic;
 
 allFiles = 'allList.txt';
 
@@ -34,13 +37,13 @@ myFiles = myData{1};
 for i = 1:length(myFiles)
     [snd,fs] = audioread(strrep(myFiles{i},'\','/'));
     
-    % Baseline mean F0 (like is >0.45
+    %%% 1: Baseline mean F0 (lik is >0.45)
     if featVect(1)
         [F0,lik] = fast_mbsc_fixedWinlen_tracking(snd,fs);
         features.meanF0 = mean(F0(lik>0.45));
     end
     
-    % Weighted Spectrogram
+    %%% 2: Weighted Spectrogram
     if featVect(2)
         if isfield(hyperParms, 'SpecWindow')
             SpecWindow = hyperParms.SpecWindow;
@@ -64,5 +67,7 @@ for i = 1:length(myFiles)
     end
     
 end % for i = 1:length(myFiles)
+
+toc
 
 end % function featureDict = extractFeatures(featVect,hyperParms)

@@ -41,6 +41,7 @@ for(i = 1:length(labels))
 end
 [~,threshold] = compute_eer(scores,labels);
 
+
 % Test the classifier
 fid = fopen(testList);
 myData = textscan(fid,'%s %s %f');
@@ -53,9 +54,9 @@ for(i = 1:length(labels))
     scores(i) = -abs(featureDict(fileList1{i})-featureDict(fileList2{i}));
 end
 prediction = (scores>threshold);
-FPR = sum(~labels & prediction)/sum(~labels);
-FNR = sum(labels & ~prediction)/sum(labels);
-TotalError = sum(xor(labels,prediction))/size(labels,1);
+FPR_CC = sum(~labels & prediction)/sum(~labels);
+FNR_CC = sum(labels & ~prediction)/sum(labels);
+TotalError_CC = sum(xor(labels,prediction))/size(labels,1);
 disp(['The false positive rate is ',num2str(FPR*100),'%.'])
 disp(['The false negative rate is ',num2str(FNR*100),'%.'])
 disp(['The Total Error is ',num2str(TotalError*100),'%.'])
