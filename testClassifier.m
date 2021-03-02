@@ -51,6 +51,18 @@ if featVect(2)
     scores = scores + scores2;
 end
 
+%%% 3: ZCR
+if featVect(3)
+    scores3 = zeros(length(labels),1);
+    
+    for(i = 1:length(labels))
+        scores3(i) = -abs(featureDict(fileList1{i}).ZCR - featureDict(fileList2{i}).ZCR) * weigthVect(3);
+    end
+    scores = scores + scores3;
+end
+
+plot(scores)
+
 % Error Rates
 prediction = (scores>threshold);
 FPR = sum(~labels & prediction)/sum(~labels);

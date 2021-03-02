@@ -1,14 +1,14 @@
 % Baseline
-featureDict = extractFeatures([1 0]);
+featureDict = extractFeatures([0 0 0 0 1]);
 
 %%% Train Clean
 trainList = 'trainCleanList.txt';
-[eer_C,threshold] = trainClassifier(trainList,featureDict,[1 0],[1 1]);
+[eer_C,threshold] = trainClassifier(trainList,featureDict,[0 0 1],[1 1 1]);
 
 
 % Test Clean
 testList = 'testCleanList.txt';
-[TotalError_CC, FPR_CC, FNR_CC] = testClassifier(testList,featureDict,threshold,[1 0],[1 1]);
+[TotalError_CC, FPR_CC, FNR_CC] = testClassifier(testList,featureDict,threshold,[0 0 1],[1 1 1]);
 
 % Test Babble
 testList = 'testBabbleList.txt';
