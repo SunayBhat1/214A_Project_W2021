@@ -1,4 +1,4 @@
-function [eer,threshold] = trainClassifier(trainList,featureDict,featVect,weigthVect)
+function [eer,threshold] = trainClassifier(trainList,featureDict)
 % trainClassifier - train classifier against any combo of features with
 %                   weights
 % Syntax:  threshold = trainClassifier(trainList,featureDict,featVect,weigthVect)
@@ -30,37 +30,21 @@ labels = myData{3};
 % Init Scores
 scores = zeros(length(labels),1);
 
-%%% 1: Baseline mean F0 (lik is >0.45)
-if featVect(1)
-    scores1 = zeros(length(labels),1);
-    
-    for i = 1:length(labels)
-        scores1(i) = -abs(featureDict(fileList1{i}).meanF0-featureDict(fileList2{i}).meanF0) * weigthVect(1);
+% MFCC_F0
+for i = 1:length(labels)
+    dtwVec = [];
+    for idt = 1:15
+        dtwVec = [dtwVec dtw(featureDict(fileList1{i}).MFCC_F0(:,idt),featureDict(fileList2{i}).MFCC_F0(:,idt))];
     end
-    scores = scores + scores1;
+    scores(i) = -sum(dtwVec);
+
+    if(mod(i,1000)==0)
+        disp(['Completed ',num2str(i),' of ',num2str(length(labels)),' files.']);
+    end
+
 end
 
-
-%%% 2: Weighted Spectrogram
-if featVect(2)
-    scores2 = zeros(length(labels),1);
-    
-    for(i = 1:length(labels))
-        scores2(i) = -ssim(featureDict(fileList1{i}).weightedSpec,featureDict(fileList2{i}).weightedSpec) * weigthVect(2);
-    end
-    scores = scores + scores2;
-end
-
-%%% 3: ZCR
-if featVect(3)
-    scores3 = zeros(length(labels),1);
-    
-    for(i = 1:length(labels))
-        scores3(i) = -abs(featureDict(fileList1{i}).ZCR - featureDict(fileList2{i}).ZCR) * weigthVect(3);
-    end
-    scores = scores + scores3;
-end
-
+scores = -(scores-max(scores))/min(scores);
 
 [eer,threshold] = compute_eer(scores,labels);
 

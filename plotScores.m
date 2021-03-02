@@ -14,46 +14,21 @@ labels = myData{3};
 scores = zeros(length(labels),1);
 
 for i = 1:length(labels)
-%     
-    % ZCR Diff
-    scores(i) = -abs(featureDict(fileList1{i}).ZCR - featureDict(fileList2{i}).ZCR);
-%     
-%     % FO autocorr
-%     F0Corr = xcorr(featureDict(fileList1{i}).F0vec,featureDict(fileList1{2}).F0vec);
-%     scores(i) = sum(F0Corr(ceil(size(F0Corr,1)/4):ceil(3*size(F0Corr,1)/4)) .^2);
-%     
-%     % Full autocorr windowed middle squared
-%     autoCorr = xcorr(featureDict(fileList1{i}).snd,featureDict(fileList1{2}).snd);
-%     scores(i) = max(autoCorr);
-%     scores(i) = sum(autoCorr(ceil(size(autoCorr,1)/4):ceil(3*size(autoCorr,1)/4)) .^2);
 
-%     % Conv Images ssim 
-%     image1 = featureDict(fileList1{i}).MFCC_F0;
-%     image2 = featureDict(fileList2{i}).MFCC_F0;
-%     convIm = conv2(image1,image2);
-%     if  size(image1,1) > size(image2,1)
-%         medfiltconv = medfilt2(abs(convIm),size(image2));
-%     elseif size(image2,1) > size(image1,1)
-%         medfiltconv = medfilt2(abs(convIm),size(image1));
-%     end
-%     
+    dtwVec = zeros(15,1);
+    for idt = 1:15
+        dtwVec(i) = dtw(featureDict(fileList1{i}).MFCC_F0(:,idt),featureDict(fileList2{i}).MFCC_F0(:,idt));
+    end
     
-%     scores(i) = -max(medfiltconv(:));
-    
-    
+    scores(i) = -sum(dtwVec);
 
-%     % Weighted Spec
-%     
-%     scores(i) = -immse(featureDict(fileList1{i}).MFCC_F0,featureDict(fileList2{i}).MFCC_F0);
-%     
-%     % fast MSBC
-%     scores(i) = abs(featureDict(fileList1{i}).meanF0 - featureDict(fileList2{i}).meanF0);
-
-    if(mod(i,100)==0)
+    if(mod(i,1000)==0)
         disp(['Completed ',num2str(i),' of ',num2str(length(labels)),' files.']);
     end
 
 end
+
+scores = -(scores-max(scores))/min(scores);
 
 [eer1,threshold] = compute_eer(scores, labels,1,'Clean');
 figure; hold on; grid on;
@@ -76,44 +51,23 @@ labels = myData{3};
 scores = zeros(length(labels),1);
 
 for i = 1:length(labels)
-    
-    % ZCR Diff
-    scores(i) = -abs(featureDict(fileList1{i}).ZCR - featureDict(fileList2{i}).ZCR);
-% 
-%     % Weighted Spec
-%     scores(i) = -immse(featureDict(fileList1{i}).MFCC_F0,featureDict(fileList2{i}).MFCC_F0);
 
-%     % Conv Images ssim 
-%     image1 = featureDict(fileList1{i}).MFCC_F0;
-%     image2 = featureDict(fileList2{i}).MFCC_F0;
-%     convIm = conv2(image1,image2);
-%     if  size(image1,1) > size(image2,1)
-%         medfiltconv = medfilt2(abs(convIm),size(image2,1));
-%     elseif size(image2,1) > size(image1,1)
-%         medfiltconv = medfilt2(abs(convIm),size(image1,1));
-%     end
-%     
-% 
-%     scores(i) = -max(medfiltconv(:));
+    dtwVec = zeros(15,1);
+    for idt = 1:15
+        dtwVec(i) = dtw(featureDict(fileList1{i}).MFCC_F0(:,idt),featureDict(fileList2{i}).MFCC_F0(:,idt));
+    end
+    
+    scores(i) = -sum(dtwVec);
     
     
-    if(mod(i,100)==0)
+    if(mod(i,1000)==0)
         disp(['Completed ',num2str(i),' of ',num2str(length(labels)),' files.']);
     end
-%     
-    % FO autocorr
-%     F0Corr = xcorr(featureDict(fileList1{i}).F0vec,featureDict(fileList1{2}).F0vec);
-%     scores(i) = -sum(F0Corr(ceil(size(F0Corr,1)/4):ceil(3*size(F0Corr,1)/4)) .^2);
 
-%     % Full autocorr windowed middle squared
-%     autoCorr = xcorr(featureDict(fileList1{i}).snd,featureDict(fileList1{2}).snd);
-%     scores(i) = max(autoCorr);
-%     scores(i) = sum(autoCorr(ceil(size(autoCorr,1)/4):ceil(3*size(autoCorr,1)/4)) .^2);
-%     
-%     % fast MSBC
-%     scores(i) = abs(featureDict(fileList1{i}).meanF0 - featureDict(fileList2{i}).meanF0);
 
 end
+
+scores = -(scores-max(scores))/min(scores);
 
 [eer2,threshold] = compute_eer(scores, labels,1,'Multi');
 figure; hold on; grid on;
