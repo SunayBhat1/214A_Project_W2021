@@ -1,4 +1,4 @@
-function [eer,threshold] = trainClassifier(trainList,featureDict)
+function [threshold,ScoreData] = trainClassifier(trainList,featureDict)
 % trainClassifier - train classifier against any combo of features with
 %                   weights
 % Syntax:  threshold = trainClassifier(trainList,featureDict,featVect,weigthVect)
@@ -28,15 +28,13 @@ fileList2 = myData{2};
 labels = myData{3};
 
 % Init Scores
-scores = zeros(length(labels),1);
+ScoreData = zeros(length(labels),15);
 
-% MFCC_F0
+% MFCC_F0  
 for i = 1:length(labels)
-    dtwVec = [];
     for idt = 1:15
-        dtwVec = [dtwVec dtw(featureDict(fileList1{i}).MFCC_F0(:,idt),featureDict(fileList2{i}).MFCC_F0(:,idt))];
+        ScoreData(i,idt) = dtw(featureDict(fileList1{i}).MFCC_F0(:,idt),featureDict(fileList2{i}).MFCC_F0(:,idt));
     end
-    scores(i) = -sum(dtwVec);
 
     if(mod(i,1000)==0)
         disp(['Completed ',num2str(i),' of ',num2str(length(labels)),' files.']);
@@ -44,9 +42,32 @@ for i = 1:length(labels)
 
 end
 
-scores = -(scores-max(scores))/min(scores);
+% Mal Distance Distibutions
+threshold.mu0 = mean(ScoreData(labels==0,:));
+threshold.std0 = std(ScoreData(labels==0,:));
+threshold.mu1 = mean(ScoreData(labels==1,:));
+threshold.std1 = std(ScoreData(labels==1,:));
+threshold.mus = mean(ScoreData);
 
-[eer,threshold] = compute_eer(scores,labels);
+
+% % K-means Supervised Training
+% [idx,C0] = kmeans(ScoreData(labels==0,:),1);
+% [idx,C1] = kmeans(ScoreData(labels==1,:),1);
+% 
+% mu = zeros(1,15);
+% sigma = zeros(1,15);
+% for i = 1:15
+%     [mu(i),sigma(i)] = normfit(ScoreData(:,i));
+% end
+% 
+% threshold.C0 = (C0 - mu)./sigma;
+% threshold.C1 = (C1 - mu)./sigma;
+
+% % Sum Diff and Scores;
+% scores = sum(ScoreData,2);
+% scores = -(scores-min(scores))/mean(scores);
+% 
+% [eer,threshold] = compute_eer(scores,labels);
 
 
 end % function [threshold] = trainClassifier(trainList)

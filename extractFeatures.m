@@ -41,9 +41,9 @@ for i = 1:length(myFiles)
     %%% MATLAB MFCC + F0
     windowLength = round(0.03*fs);
     overlapLength = round(0.025*fs);
-    melC = mfcc(snd,fs,'Window',hamming(windowLength,'periodic'),'OverlapLength',overlapLength);
+    [melC delta deltadelta] = mfcc(snd,fs,'Window',hamming(windowLength,'periodic'),'OverlapLength',overlapLength);
     f0 = pitch(snd,fs,'WindowLength',windowLength,'OverlapLength',overlapLength);
-    feat = [melC,f0];
+    feat = [melC f0];
     voicedSpeech = isVoicedSpeech(snd,fs,windowLength,overlapLength);
     feat(~voicedSpeech,:) = [];
     M = mean(feat,1);

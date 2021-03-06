@@ -13,22 +13,23 @@ fileList2 = myData{2};
 labels = myData{3};
 scores = zeros(length(labels),1);
 
+ScoreData = zeros(length(labels),15);
+
+% MFCC_F0  
 for i = 1:length(labels)
-
-    dtwVec = zeros(15,1);
     for idt = 1:15
-        dtwVec(i) = dtw(featureDict(fileList1{i}).MFCC_F0(:,idt),featureDict(fileList2{i}).MFCC_F0(:,idt));
+        ScoreData(i,idt) = dtw(featureDict(fileList1{i}).MFCC_F0(:,idt),featureDict(fileList2{i}).MFCC_F0(:,idt));
     end
-    
-    scores(i) = -sum(dtwVec);
 
-    if(mod(i,1000)==0)
+    if(mod(i,100)==0)
         disp(['Completed ',num2str(i),' of ',num2str(length(labels)),' files.']);
     end
 
 end
 
-scores = -(scores-max(scores))/min(scores);
+ScoreDataNorm = (ScoreData - mean(ScoreData,1))./std(ScoreData,[],1);
+
+scores = -sum(abs(ScoreDataNorm),2);
 
 [eer1,threshold] = compute_eer(scores, labels,1,'Clean');
 figure; hold on; grid on;
@@ -50,24 +51,21 @@ fileList2 = myData{2};
 labels = myData{3};
 scores = zeros(length(labels),1);
 
+% MFCC_F0  
 for i = 1:length(labels)
-
-    dtwVec = zeros(15,1);
     for idt = 1:15
-        dtwVec(i) = dtw(featureDict(fileList1{i}).MFCC_F0(:,idt),featureDict(fileList2{i}).MFCC_F0(:,idt));
+        ScoreData(i,idt) = dtw(featureDict(fileList1{i}).MFCC_F0(:,idt),featureDict(fileList2{i}).MFCC_F0(:,idt));
     end
-    
-    scores(i) = -sum(dtwVec);
-    
-    
-    if(mod(i,1000)==0)
+
+    if(mod(i,100)==0)
         disp(['Completed ',num2str(i),' of ',num2str(length(labels)),' files.']);
     end
 
-
 end
 
-scores = -(scores-max(scores))/min(scores);
+ScoreDataNorm = (ScoreData - mean(ScoreData,2))./std(ScoreData,[],1);
+
+scores = -sum(abs(ScoreDataNorm),2);
 
 [eer2,threshold] = compute_eer(scores, labels,1,'Multi');
 figure; hold on; grid on;
