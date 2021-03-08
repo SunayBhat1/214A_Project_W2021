@@ -6,16 +6,10 @@ function [threshold,ScoreData] = trainClassifier(trainList,featureDict)
 % Inputs:
 %    trainList - 
 %    featureDict - 
-%    featVect - 
-%    weigthVect - 
 %
 % Outputs:
 %    threshold - 
 % 
-% Features:
-%   1: LPC Mean
-%   2: Weighted Spectrogram
-%   3: Weighted Mel Spectrogram
 %------------- BEGIN CODE --------------
 
 
@@ -27,8 +21,8 @@ fileList1 = myData{1};
 fileList2 = myData{2};
 labels = myData{3};
 
-% Init Scores
-ScoreData = zeros(length(labels),15);
+% Init Scores Matrix
+ScoreData = zeros(length(labels),10);
 
 % MFCC_F0  
 for i = 1:length(labels)
@@ -42,7 +36,7 @@ for i = 1:length(labels)
 
 end
 
-% Mal Distance Distibutions
+% Mahal Distance Distibutions
 threshold.mu0 = mean(ScoreData(labels==0,:));
 threshold.std0 = std(ScoreData(labels==0,:));
 threshold.mu1 = mean(ScoreData(labels==1,:));
@@ -50,14 +44,14 @@ threshold.std1 = std(ScoreData(labels==1,:));
 threshold.mus = mean(ScoreData);
 
 
-% % K-means Supervised Training
-% [idx,C0] = kmeans(ScoreData(labels==0,:),1);
-% [idx,C1] = kmeans(ScoreData(labels==1,:),1);
+% % % K-means Supervised Training
+% [~,C0] = kmeans(ScoreData(labels==0,:),1);
+% [~,C1] = kmeans(ScoreData(labels==1,:),1);
 % 
 % mu = zeros(1,15);
 % sigma = zeros(1,15);
 % for i = 1:15
-%     [mu(i),sigma(i)] = normfit(ScoreData(:,i));
+%     [mu(i),sigma(i)] = normfit(ScoreDataT(:,i));
 % end
 % 
 % threshold.C0 = (C0 - mu)./sigma;

@@ -6,16 +6,9 @@ function [FPR,FNR,ScoreData] = testClassifier(testList,featureDict,threshold)
 % Inputs:
 %    trainList - 
 %    featureDict - 
-%    featVect - 
-%    weigthVect - 
 %
 % Outputs:
 %    threshold - 
-% 
-% Features:
-%   1: LPC Mean
-%   2: Weighted Spectrogram
-%   3: Weighted Mel Spectrogram
 %------------- BEGIN CODE --------------
 
 
@@ -30,7 +23,7 @@ labels = myData{3};
 % Init Scores
 ScoreData = zeros(length(labels),15);
 
-% MFCC_F0  
+% MFCC_F0 DTW
 for i = 1:length(labels)
     for idt = 1:15
         ScoreData(i,idt) = dtw(featureDict(fileList1{i}).MFCC_F0(:,idt),featureDict(fileList2{i}).MFCC_F0(:,idt));
@@ -58,17 +51,10 @@ M0 = mahal(ScoreData,Dist_0');
 M1 = mahal(ScoreData,Dist_1');
 
 prediction = M0 > M1;
-    
 
 % % Sum Diff and Scores;
-% scores = sum(ScoreData,2);
-% scores = -(scores-min(scores))/mean(scores);
-% prediction = (scores>threshold);
-% 
-% figure; hold on; grid on;
-% histogram(scores(find(labels== 0)));
-% histogram(scores(find(labels== 1)));
-% xline(threshold,'--r','Threshold','linewidth',3);
+% scores = -sum(ScoreData,2);
+% prediction = (scores>(threshold*mean(scores)));
 
 % % K-means
 % mu = zeros(1,15);
@@ -83,9 +69,8 @@ prediction = M0 > M1;
 % 
 % prediction = logical(sign(vecnorm(ScoreData - C0,2,2) - vecnorm(ScoreData - C1,2,2)) + 1);
 
-
 % Error Rates
-FPR = sum(~labels & prediction)/sum(~labels)
-FNR = sum(labels & ~prediction)/sum(labels)
+FPR = sum(~labels & prediction)/sum(~labels);
+FNR = sum(labels & ~prediction)/sum(labels);
 
 end % function threshold = testClassifier(testList)

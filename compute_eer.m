@@ -28,8 +28,9 @@ if plotEER
     plot(FPR*100)
     xlabel('Index','FontWeight','bold','FontSize',13);
     ylabel('% Error','FontWeight','bold','FontSize',13);
-    title({[plotName ' FNR FPR Plot, EER = ' num2str(ceil(eer)) '%'],['Threshold = ' num2str(threshold)]},...
+    title({[plotName ' FNR,FPR vs Threshold, EER = ' num2str(ceil(eer)) '%'],['Threshold = ' num2str(threshold)]},...
         'FontWeight','bold','FontSize',18);
+    legend('FNR','FPR')
     
 end
 

@@ -8,8 +8,8 @@ clc;
 
 % Define listsw
 allFiles = 'allList.txt';
-trainList = 'trainCleanList.txt';
-testList = 'testCleanList.txt';
+trainList = 'trainBabbleList.txt';
+testList = 'testBabbleList.txt';
 
 tic
 
@@ -54,11 +54,9 @@ for(i = 1:length(labels))
     scores(i) = -abs(featureDict(fileList1{i})-featureDict(fileList2{i}));
 end
 prediction = (scores>threshold);
-FPR_CC = sum(~labels & prediction)/sum(~labels);
-FNR_CC = sum(labels & ~prediction)/sum(labels);
-TotalError_CC = sum(xor(labels,prediction))/size(labels,1);
+FPR = sum(~labels & prediction)/sum(~labels);
+FNR = sum(labels & ~prediction)/sum(labels);
 disp(['The false positive rate is ',num2str(FPR*100),'%.'])
 disp(['The false negative rate is ',num2str(FNR*100),'%.'])
-disp(['The Total Error is ',num2str(TotalError*100),'%.'])
 
 toc
