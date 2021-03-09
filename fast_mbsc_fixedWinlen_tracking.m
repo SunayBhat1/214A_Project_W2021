@@ -7,7 +7,7 @@ function [F0, score] = fast_mbsc_fixedWinlen_tracking(y,fs,do_tracking,vThres,wi
 % SPAPL shareware URL) in your work if you make use this code.
 %
 % For this code, a fixed window length specified by "wintime" is used for 
-% all comb channel processing, and frame-by-frame mean-normalization is 
+% all comb channel processing, and frame-by-frame mean-normallization is 
 % not performed to reduce computational time. Your need to set the threshold
 % and wintime that are appropriate for your task. wintime should be at least 
 % twice the maximum period.
