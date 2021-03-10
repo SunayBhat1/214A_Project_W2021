@@ -1,4 +1,4 @@
-function [FPR,FNR,ScoreData] = testClassifier(testList,featureDict,threshold)
+function prediction = testClassifier(testList,threshold)
 % trainClassifier - train classifier against any combo of features with
 %                   weights
 % Syntax:  threshold = trainClassifier(trainList,featureDict,featVect,weigthVect)
@@ -12,25 +12,32 @@ function [FPR,FNR,ScoreData] = testClassifier(testList,featureDict,threshold)
 %------------- BEGIN CODE --------------
 
 
-% Open Training Files
+% Open Training Text File
 fid = fopen(testList);
 myData = textscan(fid,'%s %s %f');
 fclose(fid);
 fileList1 = myData{1};
 fileList2 = myData{2};
-labels = myData{3};
 
-% Init Scores
-ScoreData = zeros(length(labels),15);
+% Init Scores Matrix
+ScoreData = zeros(length(myData{1}),15);
 
 % MFCC_F0 DTW
-for i = 1:length(labels)
+for i = 1:length(myData{1})
+    
+    % Extract Features for each file
+    Feat_1 = extractFeatures(fileList1{i});
+    Feat_2 = extractFeatures(fileList2{i});
+    
+    % Loop through and determine Dynamic Time Warping Euclidean Distance on
+    % a per featurs basis
     for idt = 1:15
-        ScoreData(i,idt) = dtw(featureDict(fileList1{i}).MFCC_F0(:,idt),featureDict(fileList2{i}).MFCC_F0(:,idt));
+        ScoreData(i,idt) = dtw(Feat_1(:,idt),Feat_2(:,idt));
     end
 
+    % Loop Counter
     if(mod(i,100)==0)
-        disp(['Completed ',num2str(i),' of ',num2str(length(labels)),' files.']);
+        disp(['Completed ',num2str(i),' of ',num2str(length(myData{1})),' files.']);
     end
 
 end
@@ -51,26 +58,5 @@ M0 = mahal(ScoreData,Dist_0');
 M1 = mahal(ScoreData,Dist_1');
 
 prediction = M0 > M1;
-
-% % Sum Diff and Scores;
-% scores = -sum(ScoreData,2);
-% prediction = (scores>(threshold*mean(scores)));
-
-% % K-means
-% mu = zeros(1,15);
-% sigma = zeros(1,15);
-% 
-% for i = 1:15
-%     [mu(i),sigma(i)] = normfit(ScoreData(:,i));
-% end
-% 
-% C0 = threshold.C0 .* sigma + mu;
-% C1 = threshold.C1 .* sigma + mu;
-% 
-% prediction = logical(sign(vecnorm(ScoreData - C0,2,2) - vecnorm(ScoreData - C1,2,2)) + 1);
-
-% Error Rates
-FPR = sum(~labels & prediction)/sum(~labels);
-FNR = sum(labels & ~prediction)/sum(labels);
 
 end % function threshold = testClassifier(testList)

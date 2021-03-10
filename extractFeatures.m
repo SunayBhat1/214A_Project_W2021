@@ -1,65 +1,33 @@
-function featureDict = extractFeatures()
-%extractFeatures - extract and combo of listed features based on inputs
-% Syntax:  featureDict = extractFeatures(featVect,hyperParms)
+function featureMatrx = extractFeatures(filename)
+%extractFeatures - extract MFCC coefficients and F0
+% Syntax:  featureDict = extractFeatures(filename)
 %
-% Inputs:
-%    featVect - Binary vector that corresponds to the features to extract.
-%       See feature list below.
-%    hyperParms - Optional Structure that contains any hperparms needed for
-%       various feature extraction. See list below.
+% Inputs: filename - Path/name of  audio file
 %
 % Outputs:
-%    featureDict - Description
+%    featureMatrx - Feature Matrix
 % 
-% Features:
-%   1: LPC Mean
-%   2: Weighted Spectrogram
-%         |HyperParms:
-%           -SpecWindow (Window size of spectrogram)
-%   3: Weighted Mel Spectrogram
-%         |HyperParms:
-%           -SpecWindowMel (Window size of spectrogram)
+% Other .m files needed:
+%    isVoicedSpeech.m - determine voiced sections of speech
+%
+%   Source: https://www.mathworks.com/help/audio/ug/speaker-identification-using-pitch-and-mfcc.html
+%    
 %------------- BEGIN CODE --------------
-tic;
-
-allFiles = 'allList.txt';
-
-% Init feature dictionary variable
-featureDict = containers.Map;
-
-% Read in files list
-fid = fopen(allFiles);
-myData = textscan(fid,'%s');
-fclose(fid);
-myFiles = myData{1};
 
 
-% Loop through files
-for i = 1:length(myFiles)
-    [snd,fs] = audioread(strrep(myFiles{i},'\','/'));
-    
-    %%% MATLAB MFCC + F0
-    windowLength = round(0.03*fs);
-    overlapLength = round(0.025*fs);
-    [melC delta deltadelta] = mfcc(snd,fs,'Window',hamming(windowLength,'periodic'),'OverlapLength',overlapLength);
-    f0 = pitch(snd,fs,'WindowLength',windowLength,'OverlapLength',overlapLength);
-    feat = [melC f0];
-    voicedSpeech = isVoicedSpeech(snd,fs,windowLength,overlapLength);
-    feat(~voicedSpeech,:) = [];
-    M = mean(feat,1);
-    S = std(feat,[],1);
-    feat = (feat-M)./S;
-    features.MFCC_F0 = feat;
-    
-    % Save features stuctures in dictionary
-    featureDict(myFiles{i}) = features;
+[snd,fs] = audioread(strrep(filename,'\','/'));
 
-    if(mod(i,10)==0)
-        disp(['Completed ',num2str(i),' of ',num2str(length(myFiles)),' files.']);
-    end
-    
-end % for i = 1:length(myFiles)
+%%% MATLAB MFCC + F0 (See Source in header)
+windowLength = round(0.03*fs);
+overlapLength = round(0.025*fs);
+[melC] = mfcc(snd,fs,'Window',hamming(windowLength,'periodic'),'OverlapLength',overlapLength);
+f0 = pitch(snd,fs,'WindowLength',windowLength,'OverlapLength',overlapLength);
+featureMatrx = [melC f0];
+voicedSpeech = isVoicedSpeech(snd,fs,windowLength,overlapLength);
+featureMatrx(~voicedSpeech,:) = [];
+M = mean(featureMatrx,1);
+S = std(featureMatrx,[],1);
+featureMatrx = (featureMatrx-M)./S;
 
-toc
 
-end % function featureDict = extractFeatures(featVect,hyperParms)
+end % function featureMatrx = extractFeatures(filename)
